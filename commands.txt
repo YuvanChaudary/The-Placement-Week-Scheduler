@@ -1,0 +1,122 @@
+================================================================================
+MIRAI LABS PLACEMENT WEEK SCHEDULER - COMMAND REFERENCE
+================================================================================
+
+NOTE: Backend is ALREADY running on port 8000 (127.0.0.1:8000).
+      Do NOT start a second instance -- it will fail with WINERROR 10048.
+
+================================================================================
+STEP 0 - Navigate to Backend Directory
+================================================================================
+
+    cd "d:\mirai hackathon placement\backend"
+
+
+================================================================================
+STEP 1 - (OPTIONAL) Re-seed + Re-schedule Database from Scratch
+================================================================================
+
+    venv\Scripts\python.exe scripts\seed_db.py
+    venv\Scripts\python.exe scripts\run_scheduler.py
+
+
+================================================================================
+STEP 2 - Run the 12-Scenario Causal Matrix Audit
+================================================================================
+
+    venv\Scripts\python.exe scripts\causal_matrix_audit.py
+
+    Expected output:
+      PASS Count : 12 / 12 (100.0% Non-Vacuous Pass)
+      FAIL Count : 0 / 12
+      Baseline SHA-256 Node Immutability: TRUE
+      Exit code  : 0
+
+
+================================================================================
+STEP 3 - Run the Live E2E HTTP Verification
+================================================================================
+
+    venv\Scripts\python.exe scripts\live_e2e_http_verification.py
+
+    Expected output:
+      Health Status           : healthy | DB: True
+      Baseline Tuples Check   : [ALL IDENTICAL]
+      REST API Verification   : Returned active version is V1.
+      REST API Verification   : API scheduled count matches database count.
+      REST API Verification   : API scheduled interview fields match database exactly.
+      ALL LIVE HTTP E2E VERIFICATIONS PASSED SUCCESSFULLY!
+      Exit code               : 0
+
+
+================================================================================
+STEP 4 - Build the Frontend (Production Bundle)
+================================================================================
+
+    cd "d:\mirai hackathon placement\frontend"
+    npm run build
+
+    Expected output:
+      vite building for production...
+      built in X.XXs
+      Exit code : 0
+
+
+================================================================================
+STEP 5 - (OPTIONAL) Start Backend Server (only if NOT already running)
+================================================================================
+
+    cd "d:\mirai hackathon placement\backend"
+    venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+    If you see WINERROR 10048: server is ALREADY RUNNING -- skip this step.
+
+
+================================================================================
+STEP 6 - (OPTIONAL) Start Frontend Dev Server
+================================================================================
+
+    cd "d:\mirai hackathon placement\frontend"
+    npm run dev -- --host 127.0.0.1
+
+    Then open: http://127.0.0.1:5173
+
+
+================================================================================
+QUICK ALL-IN-ONE AUDIT (backend already running)
+================================================================================
+
+    cd "d:\mirai hackathon placement\backend"
+    venv\Scripts\python.exe scripts\causal_matrix_audit.py
+    venv\Scripts\python.exe scripts\live_e2e_http_verification.py
+    cd "d:\mirai hackathon placement\frontend"
+    npm run build
+
+
+================================================================================
+USEFUL API CURL COMMANDS
+================================================================================
+
+    -- Check backend health:
+    curl http://127.0.0.1:8000/api/v1/health
+
+    -- Reset schedule to baseline:
+    curl -X POST http://127.0.0.1:8000/api/v1/schedule/reset
+
+    -- View active schedule:
+    curl http://127.0.0.1:8000/api/v1/schedule
+
+    -- View schedule metrics:
+    curl http://127.0.0.1:8000/api/v1/metrics
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+    WINERROR 10048  -> Backend already running. Skip Step 5. Proceed to Step 2.
+    Connection refused -> Backend NOT running. Run Step 5 first.
+    Audit exits code 1 -> Re-run seed_db.py + run_scheduler.py (Step 1).
+    npm not found   -> Install Node.js from https://nodejs.org
+
+================================================================================
