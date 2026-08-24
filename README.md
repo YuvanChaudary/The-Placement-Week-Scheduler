@@ -81,7 +81,9 @@ Traditional management uses physical whiteboards and spreadsheets. When disrupti
 
 This is the technical heart of the system. Standard bipartite matching (Hopcroft-Karp, Hungarian Algorithm) **cannot** model multi-dimensional constraints like:
 
-$$\text{Allocation} = (\text{Student} \times \text{Company} \times \text{Panel} \times \text{Room} \times \text{Day} \times \text{TimeSlot})$$
+```
+Allocation = (Student × Company × Panel × Room × Day × TimeSlot)
+```
 
 Instead, we use a **144-bit occupancy bitmask per resource** (4 days × 36 fifteen-minute slots):
 
@@ -94,7 +96,12 @@ Day 4: bits 108–143
 
 **Feasibility check** is a single bitwise AND across three resource masks:
 
-$$\text{IsFeasible}(s, M) = \bigl[(B_\text{student}\ \&\ M) = 0\bigr] \land \bigl[(B_\text{room}\ \&\ M) = 0\bigr] \land \bigl[(B_\text{panel}\ \&\ M) = 0\bigr]$$
+```
+IsFeasible(slot, mask) =
+    (B_student & mask) == 0   # student is free
+ AND (B_room    & mask) == 0   # room is free
+ AND (B_panel   & mask) == 0   # panel is free
+```
 
 - **Bitset footprint:** 920 resources × 18 bytes = **16.5 KB total**
 - **Full schedule generation:** ~2.5 × 10⁷ bitwise checks = **< 0.32 seconds**
